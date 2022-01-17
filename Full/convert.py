@@ -12,3 +12,4 @@ def to32bit(string):
         for i in range(32 - len(string)):
             temporaryString += "0"
         string = temporaryString[::-1]
+    return string
