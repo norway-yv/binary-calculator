@@ -45,6 +45,11 @@ class convert:
             string = temporaryString[::-1]
         return string
 
+    def shorten(string):
+        if string[0] != "1":
+            string = string[string.index("1"):]
+        return string
+
 class binaryAdd:
     def byte(one, two):
         output = ""
@@ -97,4 +102,4 @@ class binaryAdd:
 inputOne = convert.to32bit(input("First number = "))
 inputTwo = convert.to32bit(input("Second number = "))
 
-print(f"Output: {binaryAdd.bit32(inputOne, inputTwo)}")
+print(f"Output: {convert.shorten(binaryAdd.bit32(inputOne, inputTwo))}")
