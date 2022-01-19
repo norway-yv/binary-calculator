@@ -48,3 +48,13 @@ def bit32(one, two):
     output += adders.sum(one[1], two[1], adders.findCarry(one[2], two[2], adders.findCarry(one[3], two[3], adders.findCarry(one[4], two[4], adders.findCarry(one[5], two[5], adders.findCarry(one[6], two[6], adders.findCarry(one[7], two[7],adders.findCarry(one[8], two[8], adders.findCarry(one[9], two[9], adders.findCarry(one[10], two[10], adders.findCarry(one[11], two[11], adders.findCarry(one[12], two[12], adders.findCarry(one[13], two[13], adders.findCarry(one[14], two[14], adders.findCarry(one[15], two[15], adders.findCarry(one[16], two[16], adders.findCarry(one[17], two[17], adders.findCarry(one[18], two[18], adders.findCarry(one[19], two[19], adders.findCarry(one[20], two[20], adders.findCarry(one[21], two[21], adders.findCarry(one[22], two[22], adders.findCarry(one[23], two[23], adders.findCarry(one[24], two[24], adders.findCarry(one[25], two[25], adders.findCarry(one[26], two[26], adders.findCarry(one[27], two[27], adders.findCarry(one[28], two[28], adders.findCarry(one[29], two[29], adders.findCarry(one[30], two[30], adders.start(one[31], two[31])["Carry"]))))))))))))))))))))))))))))))
     output += adders.sum(one[0], two[0], adders.sum(one[1], two[1], adders.findCarry(one[2], two[2], adders.findCarry(one[3], two[3], adders.findCarry(one[4], two[4], adders.findCarry(one[5], two[5], adders.findCarry(one[6], two[6], adders.findCarry(one[7], two[7],adders.findCarry(one[8], two[8], adders.findCarry(one[9], two[9], adders.findCarry(one[10], two[10], adders.findCarry(one[11], two[11], adders.findCarry(one[12], two[12], adders.findCarry(one[13], two[13], adders.findCarry(one[14], two[14], adders.findCarry(one[15], two[15], adders.findCarry(one[16], two[16], adders.findCarry(one[17], two[17], adders.findCarry(one[18], two[18], adders.findCarry(one[19], two[19], adders.findCarry(one[20], two[20], adders.findCarry(one[21], two[21], adders.findCarry(one[22], two[22], adders.findCarry(one[23], two[23], adders.findCarry(one[24], two[24], adders.findCarry(one[25], two[25], adders.findCarry(one[26], two[26], adders.findCarry(one[27], two[27], adders.findCarry(one[28], two[28], adders.findCarry(one[29], two[29], adders.findCarry(one[30], two[30], adders.start(one[31], two[31])["Carry"])))))))))))))))))))))))))))))))
     return output[::-1]
+
+def bit(number, one, two):
+    output = adders.start(one[number-1], two[number-1])["Output"]
+    save = adders.start(one[number-1], two[number-1])["Carry"]
+    output +=  adders.sum(one[number-2], two[number-2], save)
+    save = adders.findCarry(one[number-2], two[number-2], save)
+    for i in range(0, number-1, 1):
+        output += adders.sum(one[i], two[i], save)
+        save = adders.findCarry(one[i], two[i], save)
+    return output[::-1]
