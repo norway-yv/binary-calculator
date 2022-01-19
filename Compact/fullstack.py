@@ -1,105 +1,62 @@
-class logic:
-    def AND(one, two):
-        if one == "1" and two == "1":
-            return "1"
-        else:
-            return "0"
+def AND(one, two):
+    if one == "1" and two == "1":
+        return "1"
+    else:
+        return "0"
 
-    def OR(one, two):
-        if one == "1" or two == "1":
-            return "1"
-        else:
-            return "0"
+def OR(one, two):
+    if one == "1" or two == "1":
+        return "1"
+    else:
+        return "0"
 
-    def XOR(one, two):
-        if (one == "1" or two == "1") and not (one == "1" and two == "1"):
-            return "1"
-        else:
-            return "0"
+def XOR(one, two):
+    if (one == "1" or two == "1") and not (one == "1" and two == "1"):
+        return "1"
+    else:
+        return "0"
 
-class adders:
-    def start(one, two):
-        return {"Output": logic.XOR(one, two),
-            "Carry": logic.AND(one, two)}
+def start(one, two):
+    return {
+        "Output": XOR(one, two),
+        "Carry": AND(one, two)
+    }
 
-    def sum(one, two, carried):
-        return logic.XOR(carried, logic.XOR(one, two))
+def sum(one, two, carried):
+    return XOR(carried, XOR(one, two))
 
-    def findCarry(one, two, carried):
-        return logic.OR(logic.AND(carried, logic.XOR(one, two)), logic.AND(one, two))
+def findCarry(one, two, carried):
+    return OR(AND(carried, XOR(one, two)), AND(one, two))
 
-class convert:
-    def toByte(string):
-        if len(string) != 8:
-            temporaryString = string[::-1]
-            for i in range(8 - len(string)):
-                temporaryString += "0"
-            string = temporaryString[::-1]
-        return string
+def bit(number, one, two):
+    output = start(one[number-1], two[number-1])["Output"]
+    save = start(one[number-1], two[number-1])["Carry"]
+    output +=  sum(one[number-2], two[number-2], save)
+    save = findCarry(one[number-2], two[number-2], save)
+    for i in range(0, number-1, 1):
+        output += sum(one[i], two[i], save)
+        save = findCarry(one[i], two[i], save)
+    return output[::-1]
 
-    def to32bit(string):
-        if len(string) != 32:
-            temporaryString = string[::-1]
-            for i in range(32 - len(string)):
-                temporaryString += "0"
-            string = temporaryString[::-1]
-        return string
+def shorten(string):
+    if string[0] != "1":
+        string = string[string.index("1"):]
+    return string
 
-    def shorten(string):
-        if string[0] != "1":
-            string = string[string.index("1"):]
-        return string
+def toBit(number, string):
+    if len(string) != number:
+        string = string[::-1]
+        for i in range(number - len(string)):
+            string += "0"
+        string = string[::-1]
+    return string
 
-class binaryAdd:
-    def byte(one, two):
-        output = ""
-        output += adders.start(one[7], two[7])["Output"]
-        output += adders.sum(one[6], two[6], adders.start(one[7], two[7])["Carry"])
-        output += adders.sum(one[5], two[5], adders.findCarry(one[6], two[6], adders.start(one[7], two[7])["Carry"]))
-        output += adders.sum(one[4], two[4], adders.findCarry(one[5], two[5], adders.findCarry(one[6], two[6], adders.start(one[7], two[7])["Carry"])))
-        output += adders.sum(one[3], two[3], adders.findCarry(one[4], two[4], adders.findCarry(one[5], two[5], adders.findCarry(one[6], two[6], adders.start(one[7], two[7])["Carry"]))))
-        output += adders.sum(one[2], two[2], adders.findCarry(one[3], two[3], adders.findCarry(one[4], two[4], adders.findCarry(one[5], two[5], adders.findCarry(one[6], two[6], adders.start(one[7], two[7])["Carry"])))))
-        output += adders.sum(one[1], two[1], adders.findCarry(one[2], two[2], adders.findCarry(one[3], two[3], adders.findCarry(one[4], two[4], adders.findCarry(one[5], two[5], adders.findCarry(one[6], two[6], adders.start(one[7], two[7])["Carry"]))))))
-        output += adders.sum(one[0], two[0], adders.findCarry(one[1], two[1], adders.findCarry(one[2], two[2], adders.findCarry(one[3], two[3], adders.findCarry(one[4], two[4], adders.findCarry(one[5], two[5], adders.findCarry(one[6], two[6], adders.start(one[7], two[7])["Carry"])))))))
-        return output[::-1]
+inputOne = input("First number = ")
+inputTwo = input("Second number = ")
 
-    def bit32(one, two):
-        output = ""
-        output += adders.start(one[31], two[31])["Output"]
-        output += adders.sum(one[30], two[30], adders.start(one[31], two[31])["Carry"])
-        output += adders.sum(one[29], two[29], adders.findCarry(one[30], two[30], adders.start(one[31], two[31])["Carry"]))
-        output += adders.sum(one[28], two[28], adders.findCarry(one[29], two[29], adders.findCarry(one[30], two[30], adders.start(one[31], two[31])["Carry"])))
-        output += adders.sum(one[27], two[27], adders.findCarry(one[28], two[28], adders.findCarry(one[29], two[29], adders.findCarry(one[30], two[30], adders.start(one[31], two[31])["Carry"]))))
-        output += adders.sum(one[26], two[26], adders.findCarry(one[27], two[27], adders.findCarry(one[28], two[28], adders.findCarry(one[29], two[29], adders.findCarry(one[30], two[30], adders.start(one[31], two[31])["Carry"])))))
-        output += adders.sum(one[25], two[25], adders.findCarry(one[26], two[26], adders.findCarry(one[27], two[27], adders.findCarry(one[28], two[28], adders.findCarry(one[29], two[29], adders.findCarry(one[30], two[30], adders.start(one[31], two[31])["Carry"]))))))
-        output += adders.sum(one[24], two[24], adders.findCarry(one[25], two[25], adders.findCarry(one[26], two[26], adders.findCarry(one[27], two[27], adders.findCarry(one[28], two[28], adders.findCarry(one[29], two[29], adders.findCarry(one[30], two[30], adders.start(one[31], two[31])["Carry"])))))))
-        output += adders.sum(one[23], two[23], adders.findCarry(one[24], two[24], adders.findCarry(one[25], two[25], adders.findCarry(one[26], two[26], adders.findCarry(one[27], two[27], adders.findCarry(one[28], two[28], adders.findCarry(one[29], two[29], adders.findCarry(one[30], two[30], adders.start(one[31], two[31])["Carry"]))))))))
-        output += adders.sum(one[22], two[22], adders.findCarry(one[23], two[23], adders.findCarry(one[24], two[24], adders.findCarry(one[25], two[25], adders.findCarry(one[26], two[26], adders.findCarry(one[27], two[27], adders.findCarry(one[28], two[28], adders.findCarry(one[29], two[29], adders.findCarry(one[30], two[30], adders.start(one[31], two[31])["Carry"])))))))))
-        output += adders.sum(one[21], two[21], adders.findCarry(one[22], two[22], adders.findCarry(one[23], two[23], adders.findCarry(one[24], two[24], adders.findCarry(one[25], two[25], adders.findCarry(one[26], two[26], adders.findCarry(one[27], two[27], adders.findCarry(one[28], two[28], adders.findCarry(one[29], two[29], adders.findCarry(one[30], two[30], adders.start(one[31], two[31])["Carry"]))))))))))
-        output += adders.sum(one[20], two[20], adders.findCarry(one[21], two[21], adders.findCarry(one[22], two[22], adders.findCarry(one[23], two[23], adders.findCarry(one[24], two[24], adders.findCarry(one[25], two[25], adders.findCarry(one[26], two[26], adders.findCarry(one[27], two[27], adders.findCarry(one[28], two[28], adders.findCarry(one[29], two[29], adders.findCarry(one[30], two[30], adders.start(one[31], two[31])["Carry"])))))))))))    
-        output += adders.sum(one[19], two[19], adders.findCarry(one[20], two[20], adders.findCarry(one[21], two[21], adders.findCarry(one[22], two[22], adders.findCarry(one[23], two[23], adders.findCarry(one[24], two[24], adders.findCarry(one[25], two[25], adders.findCarry(one[26], two[26], adders.findCarry(one[27], two[27], adders.findCarry(one[28], two[28], adders.findCarry(one[29], two[29], adders.findCarry(one[30], two[30], adders.start(one[31], two[31])["Carry"]))))))))))))
-        output += adders.sum(one[18], two[18], adders.findCarry(one[19], two[19], adders.findCarry(one[20], two[20], adders.findCarry(one[21], two[21], adders.findCarry(one[22], two[22], adders.findCarry(one[23], two[23], adders.findCarry(one[24], two[24], adders.findCarry(one[25], two[25], adders.findCarry(one[26], two[26], adders.findCarry(one[27], two[27], adders.findCarry(one[28], two[28], adders.findCarry(one[29], two[29], adders.findCarry(one[30], two[30], adders.start(one[31], two[31])["Carry"])))))))))))))
-        output += adders.sum(one[17], two[17], adders.findCarry(one[18], two[18], adders.findCarry(one[19], two[19], adders.findCarry(one[20], two[20], adders.findCarry(one[21], two[21], adders.findCarry(one[22], two[22], adders.findCarry(one[23], two[23], adders.findCarry(one[24], two[24], adders.findCarry(one[25], two[25], adders.findCarry(one[26], two[26], adders.findCarry(one[27], two[27], adders.findCarry(one[28], two[28], adders.findCarry(one[29], two[29], adders.findCarry(one[30], two[30], adders.start(one[31], two[31])["Carry"]))))))))))))))
-        output += adders.sum(one[16], two[16], adders.findCarry(one[17], two[17], adders.findCarry(one[18], two[18], adders.findCarry(one[19], two[19], adders.findCarry(one[20], two[20], adders.findCarry(one[21], two[21], adders.findCarry(one[22], two[22], adders.findCarry(one[23], two[23], adders.findCarry(one[24], two[24], adders.findCarry(one[25], two[25], adders.findCarry(one[26], two[26], adders.findCarry(one[27], two[27], adders.findCarry(one[28], two[28], adders.findCarry(one[29], two[29], adders.findCarry(one[30], two[30], adders.start(one[31], two[31])["Carry"])))))))))))))))
-        output += adders.sum(one[15], two[15], adders.findCarry(one[16], two[16], adders.findCarry(one[17], two[17], adders.findCarry(one[18], two[18], adders.findCarry(one[19], two[19], adders.findCarry(one[20], two[20], adders.findCarry(one[21], two[21], adders.findCarry(one[22], two[22], adders.findCarry(one[23], two[23], adders.findCarry(one[24], two[24], adders.findCarry(one[25], two[25], adders.findCarry(one[26], two[26], adders.findCarry(one[27], two[27], adders.findCarry(one[28], two[28], adders.findCarry(one[29], two[29], adders.findCarry(one[30], two[30], adders.start(one[31], two[31])["Carry"]))))))))))))))))
-        output += adders.sum(one[14], two[14], adders.findCarry(one[15], two[15], adders.findCarry(one[16], two[16], adders.findCarry(one[17], two[17], adders.findCarry(one[18], two[18], adders.findCarry(one[19], two[19], adders.findCarry(one[20], two[20], adders.findCarry(one[21], two[21], adders.findCarry(one[22], two[22], adders.findCarry(one[23], two[23], adders.findCarry(one[24], two[24], adders.findCarry(one[25], two[25], adders.findCarry(one[26], two[26], adders.findCarry(one[27], two[27], adders.findCarry(one[28], two[28], adders.findCarry(one[29], two[29], adders.findCarry(one[30], two[30], adders.start(one[31], two[31])["Carry"])))))))))))))))))
-        output += adders.sum(one[13], two[13], adders.findCarry(one[14], two[14], adders.findCarry(one[15], two[15], adders.findCarry(one[16], two[16], adders.findCarry(one[17], two[17], adders.findCarry(one[18], two[18], adders.findCarry(one[19], two[19], adders.findCarry(one[20], two[20], adders.findCarry(one[21], two[21], adders.findCarry(one[22], two[22], adders.findCarry(one[23], two[23], adders.findCarry(one[24], two[24], adders.findCarry(one[25], two[25], adders.findCarry(one[26], two[26], adders.findCarry(one[27], two[27], adders.findCarry(one[28], two[28], adders.findCarry(one[29], two[29], adders.findCarry(one[30], two[30], adders.start(one[31], two[31])["Carry"]))))))))))))))))))
-        output += adders.sum(one[12], two[12], adders.findCarry(one[13], two[13], adders.findCarry(one[14], two[14], adders.findCarry(one[15], two[15], adders.findCarry(one[16], two[16], adders.findCarry(one[17], two[17], adders.findCarry(one[18], two[18], adders.findCarry(one[19], two[19], adders.findCarry(one[20], two[20], adders.findCarry(one[21], two[21], adders.findCarry(one[22], two[22], adders.findCarry(one[23], two[23], adders.findCarry(one[24], two[24], adders.findCarry(one[25], two[25], adders.findCarry(one[26], two[26], adders.findCarry(one[27], two[27], adders.findCarry(one[28], two[28], adders.findCarry(one[29], two[29], adders.findCarry(one[30], two[30], adders.start(one[31], two[31])["Carry"])))))))))))))))))))
-        output += adders.sum(one[11], two[11], adders.findCarry(one[12], two[12], adders.findCarry(one[13], two[13], adders.findCarry(one[14], two[14], adders.findCarry(one[15], two[15], adders.findCarry(one[16], two[16], adders.findCarry(one[17], two[17], adders.findCarry(one[18], two[18], adders.findCarry(one[19], two[19], adders.findCarry(one[20], two[20], adders.findCarry(one[21], two[21], adders.findCarry(one[22], two[22], adders.findCarry(one[23], two[23], adders.findCarry(one[24], two[24], adders.findCarry(one[25], two[25], adders.findCarry(one[26], two[26], adders.findCarry(one[27], two[27], adders.findCarry(one[28], two[28], adders.findCarry(one[29], two[29], adders.findCarry(one[30], two[30], adders.start(one[31], two[31])["Carry"]))))))))))))))))))))
-        output += adders.sum(one[10], two[10], adders.findCarry(one[11], two[11], adders.findCarry(one[12], two[12], adders.findCarry(one[13], two[13], adders.findCarry(one[14], two[14], adders.findCarry(one[15], two[15], adders.findCarry(one[16], two[16], adders.findCarry(one[17], two[17], adders.findCarry(one[18], two[18], adders.findCarry(one[19], two[19], adders.findCarry(one[20], two[20], adders.findCarry(one[21], two[21], adders.findCarry(one[22], two[22], adders.findCarry(one[23], two[23], adders.findCarry(one[24], two[24], adders.findCarry(one[25], two[25], adders.findCarry(one[26], two[26], adders.findCarry(one[27], two[27], adders.findCarry(one[28], two[28], adders.findCarry(one[29], two[29], adders.findCarry(one[30], two[30], adders.start(one[31], two[31])["Carry"])))))))))))))))))))))
-        output += adders.sum(one[9], two[9], adders.findCarry(one[10], two[10], adders.findCarry(one[11], two[11], adders.findCarry(one[12], two[12], adders.findCarry(one[13], two[13], adders.findCarry(one[14], two[14], adders.findCarry(one[15], two[15], adders.findCarry(one[16], two[16], adders.findCarry(one[17], two[17], adders.findCarry(one[18], two[18], adders.findCarry(one[19], two[19], adders.findCarry(one[20], two[20], adders.findCarry(one[21], two[21], adders.findCarry(one[22], two[22], adders.findCarry(one[23], two[23], adders.findCarry(one[24], two[24], adders.findCarry(one[25], two[25], adders.findCarry(one[26], two[26], adders.findCarry(one[27], two[27], adders.findCarry(one[28], two[28], adders.findCarry(one[29], two[29], adders.findCarry(one[30], two[30], adders.start(one[31], two[31])["Carry"]))))))))))))))))))))))
-        output += adders.sum(one[8], two[8], adders.findCarry(one[9], two[9], adders.findCarry(one[10], two[10], adders.findCarry(one[11], two[11], adders.findCarry(one[12], two[12], adders.findCarry(one[13], two[13], adders.findCarry(one[14], two[14], adders.findCarry(one[15], two[15], adders.findCarry(one[16], two[16], adders.findCarry(one[17], two[17], adders.findCarry(one[18], two[18], adders.findCarry(one[19], two[19], adders.findCarry(one[20], two[20], adders.findCarry(one[21], two[21], adders.findCarry(one[22], two[22], adders.findCarry(one[23], two[23], adders.findCarry(one[24], two[24], adders.findCarry(one[25], two[25], adders.findCarry(one[26], two[26], adders.findCarry(one[27], two[27], adders.findCarry(one[28], two[28], adders.findCarry(one[29], two[29], adders.findCarry(one[30], two[30], adders.start(one[31], two[31])["Carry"])))))))))))))))))))))))
-        output += adders.sum(one[7], two[7], adders.findCarry(one[8], two[8], adders.findCarry(one[9], two[9], adders.findCarry(one[10], two[10], adders.findCarry(one[11], two[11], adders.findCarry(one[12], two[12], adders.findCarry(one[13], two[13], adders.findCarry(one[14], two[14], adders.findCarry(one[15], two[15], adders.findCarry(one[16], two[16], adders.findCarry(one[17], two[17], adders.findCarry(one[18], two[18], adders.findCarry(one[19], two[19], adders.findCarry(one[20], two[20], adders.findCarry(one[21], two[21], adders.findCarry(one[22], two[22], adders.findCarry(one[23], two[23], adders.findCarry(one[24], two[24], adders.findCarry(one[25], two[25], adders.findCarry(one[26], two[26], adders.findCarry(one[27], two[27], adders.findCarry(one[28], two[28], adders.findCarry(one[29], two[29], adders.findCarry(one[30], two[30], adders.start(one[31], two[31])["Carry"]))))))))))))))))))))))))
-        output += adders.sum(one[6], two[6], adders.findCarry(one[7], two[7],adders.findCarry(one[8], two[8], adders.findCarry(one[9], two[9], adders.findCarry(one[10], two[10], adders.findCarry(one[11], two[11], adders.findCarry(one[12], two[12], adders.findCarry(one[13], two[13], adders.findCarry(one[14], two[14], adders.findCarry(one[15], two[15], adders.findCarry(one[16], two[16], adders.findCarry(one[17], two[17], adders.findCarry(one[18], two[18], adders.findCarry(one[19], two[19], adders.findCarry(one[20], two[20], adders.findCarry(one[21], two[21], adders.findCarry(one[22], two[22], adders.findCarry(one[23], two[23], adders.findCarry(one[24], two[24], adders.findCarry(one[25], two[25], adders.findCarry(one[26], two[26], adders.findCarry(one[27], two[27], adders.findCarry(one[28], two[28], adders.findCarry(one[29], two[29], adders.findCarry(one[30], two[30], adders.start(one[31], two[31])["Carry"])))))))))))))))))))))))))
-        output += adders.sum(one[5], two[5], adders.findCarry(one[6], two[6], adders.findCarry(one[7], two[7],adders.findCarry(one[8], two[8], adders.findCarry(one[9], two[9], adders.findCarry(one[10], two[10], adders.findCarry(one[11], two[11], adders.findCarry(one[12], two[12], adders.findCarry(one[13], two[13], adders.findCarry(one[14], two[14], adders.findCarry(one[15], two[15], adders.findCarry(one[16], two[16], adders.findCarry(one[17], two[17], adders.findCarry(one[18], two[18], adders.findCarry(one[19], two[19], adders.findCarry(one[20], two[20], adders.findCarry(one[21], two[21], adders.findCarry(one[22], two[22], adders.findCarry(one[23], two[23], adders.findCarry(one[24], two[24], adders.findCarry(one[25], two[25], adders.findCarry(one[26], two[26], adders.findCarry(one[27], two[27], adders.findCarry(one[28], two[28], adders.findCarry(one[29], two[29], adders.findCarry(one[30], two[30], adders.start(one[31], two[31])["Carry"]))))))))))))))))))))))))))
-        output += adders.sum(one[4], two[4], adders.findCarry(one[5], two[5], adders.findCarry(one[6], two[6], adders.findCarry(one[7], two[7],adders.findCarry(one[8], two[8], adders.findCarry(one[9], two[9], adders.findCarry(one[10], two[10], adders.findCarry(one[11], two[11], adders.findCarry(one[12], two[12], adders.findCarry(one[13], two[13], adders.findCarry(one[14], two[14], adders.findCarry(one[15], two[15], adders.findCarry(one[16], two[16], adders.findCarry(one[17], two[17], adders.findCarry(one[18], two[18], adders.findCarry(one[19], two[19], adders.findCarry(one[20], two[20], adders.findCarry(one[21], two[21], adders.findCarry(one[22], two[22], adders.findCarry(one[23], two[23], adders.findCarry(one[24], two[24], adders.findCarry(one[25], two[25], adders.findCarry(one[26], two[26], adders.findCarry(one[27], two[27], adders.findCarry(one[28], two[28], adders.findCarry(one[29], two[29], adders.findCarry(one[30], two[30], adders.start(one[31], two[31])["Carry"])))))))))))))))))))))))))))
-        output += adders.sum(one[3], two[3], adders.findCarry(one[4], two[4], adders.findCarry(one[5], two[5], adders.findCarry(one[6], two[6], adders.findCarry(one[7], two[7],adders.findCarry(one[8], two[8], adders.findCarry(one[9], two[9], adders.findCarry(one[10], two[10], adders.findCarry(one[11], two[11], adders.findCarry(one[12], two[12], adders.findCarry(one[13], two[13], adders.findCarry(one[14], two[14], adders.findCarry(one[15], two[15], adders.findCarry(one[16], two[16], adders.findCarry(one[17], two[17], adders.findCarry(one[18], two[18], adders.findCarry(one[19], two[19], adders.findCarry(one[20], two[20], adders.findCarry(one[21], two[21], adders.findCarry(one[22], two[22], adders.findCarry(one[23], two[23], adders.findCarry(one[24], two[24], adders.findCarry(one[25], two[25], adders.findCarry(one[26], two[26], adders.findCarry(one[27], two[27], adders.findCarry(one[28], two[28], adders.findCarry(one[29], two[29], adders.findCarry(one[30], two[30], adders.start(one[31], two[31])["Carry"]))))))))))))))))))))))))))))
-        output += adders.sum(one[2], two[2], adders.findCarry(one[3], two[3], adders.findCarry(one[4], two[4], adders.findCarry(one[5], two[5], adders.findCarry(one[6], two[6], adders.findCarry(one[7], two[7],adders.findCarry(one[8], two[8], adders.findCarry(one[9], two[9], adders.findCarry(one[10], two[10], adders.findCarry(one[11], two[11], adders.findCarry(one[12], two[12], adders.findCarry(one[13], two[13], adders.findCarry(one[14], two[14], adders.findCarry(one[15], two[15], adders.findCarry(one[16], two[16], adders.findCarry(one[17], two[17], adders.findCarry(one[18], two[18], adders.findCarry(one[19], two[19], adders.findCarry(one[20], two[20], adders.findCarry(one[21], two[21], adders.findCarry(one[22], two[22], adders.findCarry(one[23], two[23], adders.findCarry(one[24], two[24], adders.findCarry(one[25], two[25], adders.findCarry(one[26], two[26], adders.findCarry(one[27], two[27], adders.findCarry(one[28], two[28], adders.findCarry(one[29], two[29], adders.findCarry(one[30], two[30], adders.start(one[31], two[31])["Carry"])))))))))))))))))))))))))))))
-        output += adders.sum(one[1], two[1], adders.findCarry(one[2], two[2], adders.findCarry(one[3], two[3], adders.findCarry(one[4], two[4], adders.findCarry(one[5], two[5], adders.findCarry(one[6], two[6], adders.findCarry(one[7], two[7],adders.findCarry(one[8], two[8], adders.findCarry(one[9], two[9], adders.findCarry(one[10], two[10], adders.findCarry(one[11], two[11], adders.findCarry(one[12], two[12], adders.findCarry(one[13], two[13], adders.findCarry(one[14], two[14], adders.findCarry(one[15], two[15], adders.findCarry(one[16], two[16], adders.findCarry(one[17], two[17], adders.findCarry(one[18], two[18], adders.findCarry(one[19], two[19], adders.findCarry(one[20], two[20], adders.findCarry(one[21], two[21], adders.findCarry(one[22], two[22], adders.findCarry(one[23], two[23], adders.findCarry(one[24], two[24], adders.findCarry(one[25], two[25], adders.findCarry(one[26], two[26], adders.findCarry(one[27], two[27], adders.findCarry(one[28], two[28], adders.findCarry(one[29], two[29], adders.findCarry(one[30], two[30], adders.start(one[31], two[31])["Carry"]))))))))))))))))))))))))))))))
-        output += adders.sum(one[0], two[0], adders.sum(one[1], two[1], adders.findCarry(one[2], two[2], adders.findCarry(one[3], two[3], adders.findCarry(one[4], two[4], adders.findCarry(one[5], two[5], adders.findCarry(one[6], two[6], adders.findCarry(one[7], two[7],adders.findCarry(one[8], two[8], adders.findCarry(one[9], two[9], adders.findCarry(one[10], two[10], adders.findCarry(one[11], two[11], adders.findCarry(one[12], two[12], adders.findCarry(one[13], two[13], adders.findCarry(one[14], two[14], adders.findCarry(one[15], two[15], adders.findCarry(one[16], two[16], adders.findCarry(one[17], two[17], adders.findCarry(one[18], two[18], adders.findCarry(one[19], two[19], adders.findCarry(one[20], two[20], adders.findCarry(one[21], two[21], adders.findCarry(one[22], two[22], adders.findCarry(one[23], two[23], adders.findCarry(one[24], two[24], adders.findCarry(one[25], two[25], adders.findCarry(one[26], two[26], adders.findCarry(one[27], two[27], adders.findCarry(one[28], two[28], adders.findCarry(one[29], two[29], adders.findCarry(one[30], two[30], adders.start(one[31], two[31])["Carry"])))))))))))))))))))))))))))))))
-        return output[::-1]
+if len(inputOne) > len(inputTwo):
+    inputTwo = toBit(len(inputOne), inputTwo)
+elif len(inputTwo) > len(inputOne):
+    inputOne = toBit(len(inputTwo), inputOne)
 
-inputOne = convert.to32bit(input("First number = "))
-inputTwo = convert.to32bit(input("Second number = "))
-
-print(f"Output: {convert.shorten(binaryAdd.bit32(inputOne, inputTwo))}")
+print(f"Output: {shorten(bit(len(inputOne), inputOne, inputTwo))}")
